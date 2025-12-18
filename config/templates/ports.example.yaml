@@ -1,0 +1,56 @@
+# Пример конфигурации портов
+# Копируйте нужные секции в config/ports.yaml
+
+# TCP порт с ПЛК Siemens
+siemens_plc:
+  enabled: true
+  type: "tcp"
+  host: "192.168.1.100"
+  port: 502
+  timeout: 2.0
+  description: "ПЛК Siemens S7-1200"
+
+  devices:
+    - name: "conveyor_motor"
+      address: 1
+      poll_interval: 0.5
+      description: "Двигатель конвейера"
+
+      registers:
+        - type: "holding"
+          address: 40001
+          name: "speed_setpoint"
+          description: "Задание скорости"
+          unit: "об/мин"
+          read_only: false
+
+        - type: "holding"
+          address: 40002
+          name: "actual_speed"
+          description: "Фактическая скорость"
+          unit: "об/мин"
+          read_only: true
+
+# RTU over TCP через MOXA
+energy_meters:
+  enabled: true
+  type: "rtu_tcp"
+  host: "192.168.1.50"
+  port: 4001
+  timeout: 3.0
+
+  devices:
+    - name: "main_meter"
+      address: 1
+      poll_interval: 5.0
+      description: "Основной счетчик"
+
+      registers:
+        - type: "holding"
+          address: 0
+          name: "total_energy"
+          description: "Суммарная энергия"
+          unit: "кВт·ч"
+          scale: 0.01
+          data_type: "int32"
+          read_only: true

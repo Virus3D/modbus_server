@@ -1,0 +1,135 @@
+# Конфигурация Modbus сервера
+server:
+  name: "Modbus Server"
+  host: "0.0.0.0"
+  api_port: 8000
+  websocket_port: 8765
+  log_level: "INFO"
+  log_file: "logs/modbus_server.log"
+  max_workers: 10
+  debug: false
+  reload: false
+
+# Настройки базы данных
+database:
+  url: "sqlite+aiosqlite:///data/modbus.db"
+  # Для PostgreSQL раскомментируйте строку ниже:
+  # url: "postgresql://modbus_user:modbus_password@localhost:5432/modbus_data"
+  pool_size: 20
+  max_overflow: 30
+  echo: false
+  echo_pool: false
+  pool_recycle: 3600
+  pool_pre_ping: true
+
+# Настройки опроса устройств
+polling:
+  max_concurrent_ports: 10
+  device_poll_delay: 0.01  # Задержка между устройствами на одном порту
+  buffer_size: 1000        # Размер буфера для батчевой записи в БД
+  statistics_interval: 60  # Интервал сбора статистики в секундах
+  max_retry_attempts: 3
+  retry_delay: 5.0
+  connection_timeout: 10.0
+  read_timeout: 5.0
+  write_timeout: 5.0
+
+# Настройки WebSocket сервера
+websocket:
+  enabled: true
+  max_connections: 1000
+  ping_interval: 20
+  ping_timeout: 10
+  message_queue_size: 100
+  compression: true
+  max_message_size: 10485760  # 10 MB
+
+# Настройки REST API
+api:
+  enabled: true
+  title: "Modbus Server API"
+  description: "API для управления Modbus устройствами"
+  version: "1.0.0"
+  docs_url: "/docs"
+  redoc_url: "/redoc"
+  openapi_url: "/openapi.json"
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+
+# Настройки кэширования
+cache:
+  enabled: true
+  backend: "memory"  # memory, redis, disk
+  ttl: 300
+  max_size: 10000
+  redis_url: "redis://localhost:6379/0"
+  disk_cache_path: "cache"
+
+# Настройки безопасности
+security:
+  secret_key: "change-this-in-production"
+  token_expire_minutes: 1440
+  bcrypt_rounds: 12
+  rate_limit_enabled: true
+  allowed_hosts:
+    - "localhost"
+    - "127.0.0.1"
+    - "0.0.0.0"
+
+# Настройки логирования
+logging:
+  level: "INFO"
+  format: "json"
+  rotate: true
+  max_size_mb: 100
+  backup_count: 5
+  compress: true
+
+# Настройки мониторинга
+monitoring:
+  enabled: true
+  metrics_port: 9091
+  health_check_interval: 30
+  system_stats_interval: 60
+  alerting:
+    enabled: false
+    email_notifications: false
+    webhook_url: ""
+
+# Настройки уведомлений
+notifications:
+  enabled: false
+  email:
+    smtp_server: ""
+    smtp_port: 587
+    username: ""
+    password: ""
+    from_address: ""
+  telegram:
+    enabled: false
+    bot_token: ""
+    chat_id: ""
+
+# Настройки экспорта данных
+export:
+  enabled: true
+  formats:
+    - "csv"
+    - "json"
+    - "xlsx"
+  default_format: "csv"
+  max_records_per_export: 100000
+  retention_days: 90
+
+# Путь к файлу конфигурации портов
+ports_config_file: "ports.yaml"
+# Или можно указать порты прямо здесь (раскомментируйте для использования):
+# ports:
+#   пример_порта:
+#     type: "tcp"
+#     host: "192.168.1.100"
+#     port: 502

@@ -1,0 +1,38 @@
+# Основные зависимости
+pymodbus==3.11.4
+pyserial==3.5
+pyserial-asyncio==0.6
+
+# Web и API
+fastapi==0.124.0
+uvicorn[standard]==0.38.0
+websockets==15.0
+aiohttp==3.13.2
+
+# База данных
+asyncpg==0.31.0
+sqlalchemy==2.0.44
+aiosqlite==0.21.0
+alembic==1.17.2
+
+# Конфигурация
+pyyaml==6.0.3
+python-dotenv==1.2.1
+pydantic==2.12.5
+pydantic-settings==2.12.0
+jsonschema==4.25.1
+
+# Утилиты
+structlog==25.5.0
+psutil==7.1.3
+cachetools==6.2.3
+redis==7.1.0
+
+# Для графиков и анализа
+pandas==2.3.3
+numpy==2.3.5
+plotly==6.5.0
+
+# Тестирование
+pytest==9.0.2
+pytest-asyncio==1.3.0

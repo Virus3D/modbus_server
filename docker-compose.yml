@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  modbus-server:
+    build: .
+    container_name: modbus-server
+    ports:
+      - "8000:8000" # REST API
+      - "8765:8765" # WebSocket
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+      - ./exports:/app/exports
+      - /dev:/dev:ro # доступ к последовательным портам
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0" # пример для USB-COM адаптера
+      - "/dev/ttyS0:/dev/ttyS0" # пример для COM1
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/modbus_data
+      - TZ=Europe/Moscow
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    privileged: true # для доступа к последовательным портам
+    networks:
+      - modbus-network
+
+  db:
+    image: timescale/timescaledb:latest-pg15
+    container_name: modbus-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: modbus_data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - modbus-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: modbus-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - modbus-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: modbus-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - modbus-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: modbus-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - modbus-network
+
+networks:
+  modbus-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  grafana_data:
+  prometheus_data:

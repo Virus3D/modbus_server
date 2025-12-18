@@ -1,0 +1,9 @@
+.vent
+.vscode
+backup/*
+config/ports.yaml
+data/*
+logs/*
+**/__pycache__
+vent
+.env

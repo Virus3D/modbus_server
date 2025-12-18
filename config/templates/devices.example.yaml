@@ -1,0 +1,21 @@
+# Пример основного конфигурационного файла
+# Копируйте в config/devices.yaml и настройте под свои нужды
+
+server:
+  name: "Мой Modbus Сервер"
+  host: "0.0.0.0"
+  api_port: 8000
+  websocket_port: 8765
+  log_level: "INFO"
+  log_file: "logs/modbus_server.log"
+  max_workers: 10
+
+database:
+  url: "postgresql://user:password@localhost:5432/modbus_data"
+  pool_size: 20
+  max_overflow: 30
+
+# Указываем путь к файлу с конфигурацией портов
+ports_config_file: "config/ports.yaml"
+
+# Остальные настройки...
